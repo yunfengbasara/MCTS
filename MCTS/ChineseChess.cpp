@@ -529,25 +529,37 @@ std::vector<Position> Elephant::LegalPosition(Board* pBoard)
 	Position lu(pos.x - 2, pos.y + 2);
 	if ((side == SideType::Red && lu.x >= 0 && lu.y <= 4 && pBoard->LegalSideCheck(side, lu)) ||
 		(side == SideType::Black && lu.x >= 0 && lu.y <= BOARDHEIGHT && pBoard->LegalSideCheck(side, lu))) {
-		legalPosition.push_back(lu);
+		Position lud(pos.x - 1, pos.y + 1);
+		if (!pBoard->CheckPosHasMan(lud)) {
+			legalPosition.push_back(lu);
+		}
 	}
 
 	Position ru(pos.x + 2, pos.y + 2);
 	if ((side == SideType::Red && ru.x <= BOARDWIDTH && ru.y <= 4 && pBoard->LegalSideCheck(side, ru)) ||
 		(side == SideType::Black && ru.x <= BOARDWIDTH && ru.y <= BOARDHEIGHT && pBoard->LegalSideCheck(side, ru))) {
-		legalPosition.push_back(ru);
+		Position rud(pos.x + 1, pos.y + 1);
+		if (!pBoard->CheckPosHasMan(rud)) {
+			legalPosition.push_back(ru);
+		}
 	}
 
 	Position ld(pos.x - 2, pos.y - 2);
 	if ((side == SideType::Red && ld.x >= 0 && ld.y >= 0 && pBoard->LegalSideCheck(side, ld)) ||
 		(side == SideType::Black && ld.x >= 0 && ld.y >= BOARDHEIGHT - 4 && pBoard->LegalSideCheck(side, ld))) {
-		legalPosition.push_back(ld);
+		Position ldd(pos.x - 1, pos.y - 1);
+		if (!pBoard->CheckPosHasMan(ldd)) {
+			legalPosition.push_back(ld);
+		}
 	}
 
 	Position rd(pos.x + 2, pos.y - 2);
 	if ((side == SideType::Red && rd.x <= BOARDWIDTH && rd.y >= 0 && pBoard->LegalSideCheck(side, rd)) ||
 		(side == SideType::Black && rd.x <= BOARDWIDTH && rd.y >= BOARDHEIGHT - 4 && pBoard->LegalSideCheck(side, rd))) {
-		legalPosition.push_back(rd);
+		Position rdd(pos.x + 1, pos.y - 1);
+		if (!pBoard->CheckPosHasMan(rdd)) {
+			legalPosition.push_back(rd);
+		}
 	}
 
 	return legalPosition;
@@ -691,7 +703,7 @@ std::vector<Position> Vehicle::LegalPosition(Board* pBoard)
 
 	for (int y = pos.y + 1; y <= BOARDHEIGHT; y++) {
 		Position p(pos.x, y);
-		if (fCheckPos(p)) {
+		if (!fCheckPos(p)) {
 			break;
 		}
 	}

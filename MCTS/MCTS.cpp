@@ -61,7 +61,8 @@ void Node::Update(int win, int total)
 	}
 
 	float fWinRate = (float)m_nWinTimes / m_nTotalTimes;
-	float parentSim = log((float)m_pParent->m_nTotalTimes);
+	// 由于是从底向上更新，上层的总次数要加1
+	float parentSim = log((float)m_pParent->m_nTotalTimes + 1);
 	float lambda = sqrt(parentSim / m_nTotalTimes);
 	m_fUCB = fWinRate + lambda * g_fConfident;
 }
@@ -98,6 +99,9 @@ void MCTS::Init()
 {
 	Position RedPosGeneral(4, 0);
 	m_nBoard.AddGeneral(RedPosGeneral, SideType::Red);
+
+	Position RedPosGuarder(5, 0);
+	m_nBoard.AddMan(RedPosGuarder, ManType::Guarder, SideType::Red);
 
 	Position RedPosElephant1(4, 2);
 	m_nBoard.AddMan(RedPosElephant1, ManType::Elephant, SideType::Red);
@@ -147,49 +151,35 @@ Node* MCTS::Selection(Node* pCurrent)
 		pCurrent = m_pRoot;
 	}
 
-	auto IsNormalNode = [](Node* pNode) {
-		// 没有模拟的节点
-		if (!pNode->IsSimulate()) {
-			return false;
-		}
-
-		// 结束的节点
-		if (pNode->IsFinish()) {
-			return false;
-		}
-
-		// 没有扩展的节点
-		if (!pNode->IsExpand()) {
-			return false;
-		}
-
-		// 普通节点
-		return true;
-	};
-
 	// 找到最佳节点
-	while (IsNormalNode(pCurrent)) {
+	while (pCurrent->IsExpand()) {
 		float bestUCB = -0.1f;
 		auto& children = pCurrent->GetChildren();
 		for (auto& pNode : children) {
-			if (!IsNormalNode(pNode)) {
-				pCurrent = pNode;
-				break;
+			if (!pNode->IsSimulate() || pNode->IsFinish()) {
+				return pNode;
 			}
+
 			if (pNode->UCB() > bestUCB) {
 				pCurrent = pNode;
 				bestUCB = pCurrent->UCB();
 			}
 		}
 	}
-
 	return pCurrent;
 }
 
 Node* MCTS::Expand(Node* pCurrent)
 {
-	if (pCurrent->IsFinish() ||
-		pCurrent->IsExpand()) {
+	if (pCurrent->IsFinish()) {
+		return pCurrent;
+	}
+
+	if (pCurrent->IsExpand()) {
+		return pCurrent;
+	}
+
+	if (!pCurrent->IsSimulate()) {
 		return pCurrent;
 	}
 
@@ -291,7 +281,7 @@ void MCTS::Backpropagation(Node* pCurrent, FinishType finish)
 	}
 }
 
-Node* MCTS::GetBestNode(Node * pCurrent)
+Node* MCTS::GetBestNode(Node* pCurrent)
 {
 	if (pCurrent == nullptr) {
 		pCurrent = m_pRoot;
@@ -312,4 +302,19 @@ Node* MCTS::GetBestNode(Node * pCurrent)
 	}
 
 	return pCurrent;
+}
+
+Node* MCTS::SelectChildNode(Node* pCurrent, int bx, int by, int ex, int ey)
+{
+	auto& children = pCurrent->GetChildren();
+	for (auto& pNode : children) {
+		auto ori = pNode->GetAction().m_nOriPos;
+		auto dst = pNode->GetAction().m_nDstPos;
+		if (ori.x == bx && ori.y == by &&
+			dst.x == ex && dst.y == ey) {
+			return pNode;
+		}
+	}
+
+	return nullptr;
 }

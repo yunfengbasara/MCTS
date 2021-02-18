@@ -39,6 +39,7 @@ public:
 	void Backpropagation(Node*, ChineseChess::FinishType);
 
 	Node* GetBestNode(Node* pCurrent = nullptr);
+	Node* SelectChildNode(Node* pCurrent, int bx, int by, int ex, int ey);
 
 private:
 	ChineseChess::Board	m_nBoard;
