@@ -61,7 +61,7 @@ void Node::Update(int win, int total)
 	}
 
 	float fWinRate = (float)m_nWinTimes / m_nTotalTimes;
-	// ç”±äºŽæ˜¯ä»Žåº•å‘ä¸Šæ›´æ–°ï¼Œä¸Šå±‚çš„æ€»æ¬¡æ•°è¦åŠ 1
+	// ÓÉÓÚÊÇ´Óµ×ÏòÉÏ¸üÐÂ£¬ÉÏ²ãµÄ×Ü´ÎÊýÒª¼Ó1
 	float parentSim = log((float)m_pParent->m_nTotalTimes + 1);
 	float lambda = sqrt(parentSim / m_nTotalTimes);
 	m_fUCB = fWinRate + lambda * g_fConfident;
@@ -151,7 +151,7 @@ Node* MCTS::Selection(Node* pCurrent)
 		pCurrent = m_pRoot;
 	}
 
-	// æ‰¾åˆ°æœ€ä½³èŠ‚ç‚¹
+	// ÕÒµ½×î¼Ñ½Úµã
 	while (pCurrent->IsExpand()) {
 		float bestUCB = -0.1f;
 		auto& children = pCurrent->GetChildren();
@@ -238,8 +238,6 @@ FinishType MCTS::Simulate(Node* pCurrent)
 	SideType nowTurn = lastType == SideType::Red ? SideType::Black : SideType::Red;
 
 	FinishType finish = tempBoard.CheckFinishType();
-	pCurrent->GetAction().m_nFinishType = finish;
-	
 	while (finish == FinishType::Unknown) {
 		std::pair<Position, Position> killGeneralPos;
 		if (tempBoard.CheckKillGeneral(nowTurn, killGeneralPos)) {

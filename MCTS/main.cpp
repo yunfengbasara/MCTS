@@ -7,7 +7,7 @@ int main()
 {
 	MCTS mcts;
 	mcts.Init();
-	for (int trytime = 0; trytime < 30000; trytime++) {
+	for (int trytime = 0; trytime < 4000; trytime++) {
 		Node* pNode = mcts.GetRoot();
 		pNode = mcts.Selection(pNode);
 		pNode = mcts.Expand(pNode);
@@ -24,7 +24,7 @@ int main()
 		std::cout << "to:" << dst.x << "," << dst.y << std::endl;
 
 		if (pBest->IsFinish()) {
-			std::cout << "Game Over" << std::endl;
+			std::cout << "Game Over Red Win" << std::endl;
 			break;
 		}
 
@@ -39,10 +39,16 @@ int main()
 		by = input % 10;
 		input = input / 10;
 		bx = input % 10;
-		pBest = mcts.SelectChildNode(pBest, bx, by, ex, ey);
-		if (pBest == nullptr) {
+		Node* pTempBest = mcts.SelectChildNode(pBest, bx, by, ex, ey);
+		if (pTempBest == nullptr) {
 			std::cout << "Can not find node, please reinput." << std::endl;
 			goto REINPUT;
+		}
+
+		pBest = pTempBest;
+		if (pBest->IsFinish()) {
+			std::cout << "Game Over Black Win" << std::endl;
+			break;
 		}
 
 		for (int trytime = 0; trytime < 1000; trytime++) {

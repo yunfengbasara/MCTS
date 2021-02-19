@@ -311,42 +311,46 @@ std::vector<std::tuple<Position, Position, FinishType>> Board::GetLegalPosition(
 	if (sideType == SideType::Red) {
 		auto generalPosLst = m_nRedGeneral->LegalPosition(this);
 		for (auto& pos : generalPosLst) {
-			FinishType finish = FinishType::Unknown;
 			if (pos == m_nBlackGeneral->GetPosition()) {
-				finish = FinishType::RedVictory;
-			}
-			legalPosition.push_back(std::make_tuple(m_nRedGeneral->GetPosition(), pos, finish));
+				legalPosition.clear();
+				legalPosition.push_back(std::make_tuple(m_nRedGeneral->GetPosition(), pos, FinishType::RedVictory));
+				return legalPosition;
+			}			
+			legalPosition.push_back(std::make_tuple(m_nRedGeneral->GetPosition(), pos, FinishType::Unknown));
 		}
 		
 		for (auto& pMan : m_nRedMan) {
 			auto manPosLst = pMan->LegalPosition(this);
 			for (auto& pos : manPosLst) {
-				FinishType finish = FinishType::Unknown;
 				if (pos == m_nBlackGeneral->GetPosition()) {
-					finish = FinishType::RedVictory;
+					legalPosition.clear();
+					legalPosition.push_back(std::make_tuple(pMan->GetPosition(), pos, FinishType::RedVictory));
+					return legalPosition;
 				}
-				legalPosition.push_back(std::make_tuple(pMan->GetPosition(), pos, finish));
+				legalPosition.push_back(std::make_tuple(pMan->GetPosition(), pos, FinishType::Unknown));
 			}
 		}
 	}
 	else {
 		auto generalPosLst = m_nBlackGeneral->LegalPosition(this);
 		for (auto& pos : generalPosLst) {
-			FinishType finish = FinishType::Unknown;
 			if (pos == m_nRedGeneral->GetPosition()) {
-				finish = FinishType::BlackVictory;
+				legalPosition.clear();
+				legalPosition.push_back(std::make_tuple(m_nBlackGeneral->GetPosition(), pos, FinishType::BlackVictory));
+				return legalPosition;
 			}
-			legalPosition.push_back(std::make_tuple(m_nBlackGeneral->GetPosition(), pos, finish));
+			legalPosition.push_back(std::make_tuple(m_nBlackGeneral->GetPosition(), pos, FinishType::Unknown));
 		}
 
 		for (auto& pMan : m_nBlackMan) {
 			auto manPosLst = pMan->LegalPosition(this);
 			for (auto& pos : manPosLst) {
-				FinishType finish = FinishType::Unknown;
 				if (pos == m_nRedGeneral->GetPosition()) {
-					finish = FinishType::BlackVictory;
+					legalPosition.clear();
+					legalPosition.push_back(std::make_tuple(pMan->GetPosition(), pos, FinishType::BlackVictory));
+					return legalPosition;
 				}
-				legalPosition.push_back(std::make_tuple(pMan->GetPosition(), pos, finish));
+				legalPosition.push_back(std::make_tuple(pMan->GetPosition(), pos, FinishType::Unknown));
 			}
 		}
 	}
